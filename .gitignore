@@ -1,0 +1,15 @@
+/test/
+/.htaccess
+# Composer
+/vendor/
+/composer.phar
+/.idea
+/nbproject/
+*.pdf
+*.rtf
+*.mp4
+*.avi
+*.doc
+*.docx
+*.xls
+*.xlsx

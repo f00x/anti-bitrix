@@ -1,0 +1,21 @@
+{
+    "name": "f00x/anti-bitrix",
+    "description": "A set of classes for easy operation. With the database and Bitrix settings.In case the bitrix code does not work for you =) See the examples in the file. See the readme.md file for examples.",
+    "keywords": ["bitrix", "form", "email"],
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Evgeniy Lisin",
+            "email": "httpF00x@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Webmozart\\Assert\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=5.6.0",
+        "nette/mail": "2.4.5"
+    }
+}
