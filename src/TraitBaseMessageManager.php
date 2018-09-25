@@ -1,48 +1,51 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace f00x\AntiBitrix;
 
-/**
- * Description of SendEmailManager
- *
- * @author adm.e.lisin
- */
-class SendEmailManager {
+use Exception;
+use PDO;
+use PDOStatement;
+use Swift_Mailer;
+use Swift_MailTransport;
+
+trait TraitBaseMessageManager {
 
     private $DB;
     private $currentLanguageCode;
 
     /**
-     * @var \PDOStatement
+     * @var PDOStatement
      */
     private $StatementEmailTemplate;
     private $currentCodeEmailTemplate;
 
     /**
-     * @var \PDOStatement
+     * @var PDOStatement
      */
     private $StatementSubscriptionEmail;
     private $currentCodeSubscriptionEmail;
 
     /**
-     * @var \PDOStatement
+     * @var PDOStatement
      */
     private $StatementSubscriptionListEmail;
     private $currentIdSubscriptionEmail;
 
-    public function __construct(\PDO $DB, $langCode = 'ru') {
+    /**
+     *
+     * @var Swift_Mailer
+     */
+    private $Smtp;
+
+    public function __construct(PDO $DB, $langCode = 'ru') {
         $this->DB = $DB;
         $this->currentLanguageCode = $langCode;
+        $transport = new Swift_MailTransport();
+        $this->Smtp = new Swift_Mailer($transport);
     }
 
     /**
-     * @return \PDOStatement
+     * @return PDOStatement
      */
     private function getStatementEmailTemplate() {
         if (!$this->StatementEmailTemplate) {
@@ -50,7 +53,7 @@ class SendEmailManager {
                 FROM `b_event_message` left join  `b_lang` on  `b_lang`.`LID`=`b_event_message`.`LID`
                     where `b_lang`.`LANGUAGE_ID`=:lang_code 
                     and `b_event_message`.`EVENT_NAME`=:code');
-            assert($stmt instanceof \PDOStatement);
+            assert($stmt instanceof PDOStatement);
             $stmt->bindParam(':code', $this->currentCodeEmailTemplate);
             $stmt->bindParam(':lang_code', $this->currentLanguageCode);
             $this->StatementEmailTemplate = $stmt;
@@ -59,12 +62,12 @@ class SendEmailManager {
     }
 
     /**
-     * @return \PDOStatement
+     * @return PDOStatement
      */
     private function getStatementSubscriptionEmail() {
         if (!$this->StatementSubscriptionEmail) {
             $stmt = $this->DB->prepare('SELECT * FROM `b_list_rubric` WHERE `CODE`=:code');
-            assert($stmt instanceof \PDOStatement);
+            assert($stmt instanceof PDOStatement);
             $stmt->bindParam(':code', $this->currentCodeSubscriptionEmail);
             $this->StatementSubscriptionEmail = $stmt;
         }
@@ -72,7 +75,7 @@ class SendEmailManager {
     }
 
     /**
-     * @return \PDOStatement
+     * @return PDOStatement
      */
     private function getStatementSubscriptionListEmail() {
         if (!$this->StatementSubscriptionListEmail) {
@@ -80,7 +83,7 @@ class SendEmailManager {
                     . 'FROM `b_subscription` '
                     . 'inner join `b_subscription_rubric` on `b_subscription_rubric`.`SUBSCRIPTION_ID`= `b_subscription`.`ID` '
                     . 'WHERE `LIST_RUBRIC_ID`=:id');
-            assert($stmt instanceof \PDOStatement);
+            assert($stmt instanceof PDOStatement);
             $stmt->bindParam(':id', $this->currentIdSubscriptionEmail);
             $this->StatementSubscriptionListEmail = $stmt;
         }
@@ -90,8 +93,8 @@ class SendEmailManager {
     /**
      * 
      * @param type $codeEmailTemplate
-     * @return \f00x\AntiBitrix\TemplateEmail
-     * @throws \Exception
+     * @return TemplateEmail
+     * @throws Exception
      */
     public function getTemplateEmail($codeEmailTemplate) {
         $this->currentCodeEmailTemplate = $codeEmailTemplate;
@@ -100,15 +103,15 @@ class SendEmailManager {
             $arrayInfo = $this->getStatementEmailTemplate()->fetch();
             return new TemplateEmail($arrayInfo);
         } else {
-            throw new \Exception(__CLASS__ . ' ' . __METHOD__ . ' Error PDOStatement Execute codeErrorPDO= ' . $this->getStatementEmailTemplate()->errorCode() . '  ' . $this->getStatementEmailTemplate()->errorInfo()[2]);
+            throw new Exception(__CLASS__ . ' ' . __METHOD__ . ' Error PDOStatement Execute codeErrorPDO= ' . $this->getStatementEmailTemplate()->errorCode() . '  ' . $this->getStatementEmailTemplate()->errorInfo()[2]);
         }
     }
 
     /**
      * 
      * @param type $codeSubscriptionEmail
-     * @return \f00x\AntiBitrix\SubscriptionEmail
-     * @throws \Exception
+     * @return SubscriptionEmail
+     * @throws Exception
      */
     public function getSubscriptionEmail($codeSubscriptionEmail) {
         $this->currentCodeSubscriptionEmail = $codeSubscriptionEmail;
@@ -122,41 +125,17 @@ class SendEmailManager {
 
                 $listEmailInfo = $this->getStatementSubscriptionListEmail()->fetchAll();
             }
-            return new SubscriptionEmail($arrayInfo, $listEmailInfo);
+
+            $Subscription = new SubscriptionEmail($arrayInfo, $listEmailInfo);
+
+            return $Subscription;
         } else {
-            throw new \Exception(__CLASS__ . ' ' . __METHOD__ . ' Error PDOStatement Execute codeErrorPDO= ' . $this->getStatemenForm()->errorCode() . ' and ' . $this->getStatementFieldList()->errorCode());
+            throw new Exception(__CLASS__ . ' ' . __METHOD__ . ' Error PDOStatement Execute codeErrorPDO= ' . $this->getStatemenForm()->errorCode() . ' and ' . $this->getStatementFieldList()->errorCode());
         }
     }
 
-    public function sendMsgForm(Form $Form) {
-        $TemplateEmail = $this->getTemplateEmail($Form->getMailEventKey());
-        $SubscriptionEmail = $this->getSubscriptionEmail($Form->getMailEventKey());
-        if ($SubscriptionEmail->isActive()) {
-            $TemplateEmail->applyFormData($Form);
-            $this->sendEmail($SubscriptionEmail->getStringRecipientEmail(), $TemplateEmail->getTextSubject(), $TemplateEmail->getTextMessage(), $this->getHeadersMsgString($TemplateEmail, $SubscriptionEmail));
-        }
-    }
-    private function sendEmail($to,$subject,$message,$headers)
-    {
-        mail($to, $subject, $message,$headers);
-        
-    }
-    private function getHeadersMsgString(TemplateEmail $TemplateEmail, SubscriptionEmail $SubscriptionEmail) {
-        $to = $SubscriptionEmail->getStringRecipientEmail();
-        $from=$SubscriptionEmail->getEmailFrom();
-        $reply=$TemplateEmail->getEmailReply();
-        $mimeType = $TemplateEmail->getMimeType();
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-type: '.$mimeType.'; charset=UTF-8',
-            'To: ' . $to,
-            'From: ' .$from
-        ];
-        
-        if(!empty($reply)){
-            $headers[]='Reply-To: '.$reply;
-        }
-        return implode("\r\n",$headers);
+    function setSmtp(\Swift_Mailer $Smtp) {
+        $this->Smtp = $Smtp;
     }
 
 }

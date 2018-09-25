@@ -11,11 +11,11 @@
     ],
     "autoload": {
         "psr-4": {
-            "Webmozart\\Assert\\": "src/"
+            "f00x\\AntiBitrix\\": "src/"
         }
     },
     "require": {
         "php": ">=5.6.0",
-        "nette/mail": "2.4.5"
+        "swiftmailer/swiftmailer": "^5.4.12"
     }
 }

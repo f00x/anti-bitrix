@@ -1,5 +1,6 @@
 /test/
 /.htaccess
+/bitrix/
 # Composer
 /vendor/
 /composer.phar

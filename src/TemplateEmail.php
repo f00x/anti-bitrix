@@ -17,6 +17,8 @@ class TemplateEmail {
 
     const TYPE_KEY_HTML = 'html';
     const TYPE_KEY_TEXT = 'text';
+    const MIME_TYPE_HTML = 'text/html';
+    const MIME_TYPE_PLAIN = 'text/plain';
 
     /**
      * @var string
@@ -32,22 +34,24 @@ class TemplateEmail {
     protected $RegularExpressionKeyParameter;
     private $mimeType;
     private $emailReply;
+
     public function __construct($arrayGroupTemplate) {
 
         $this->setType($arrayGroupTemplate['BODY_TYPE']);
         $this->templateSubject = $arrayGroupTemplate['SUBJECT'];
         $this->templateMessage = $arrayGroupTemplate['MESSAGE'];
-         $this->emailReply=$arrayGroupTemplate['REPLY_TO'];
+        $this->emailReply = $arrayGroupTemplate['REPLY_TO'];
         $this->initEmtiListParameter();
     }
 
     private function setType($key) {
-        if($key==self::TYPE_KEY_HTML){
-            $this->mimeType='text/html';
-        }else{
-            $this->mimeType='text/plain';
+        if ($key == self::TYPE_KEY_HTML) {
+            $this->mimeType = self::MIME_TYPE_HTML;
+        } else {
+            $this->mimeType = self::MIME_TYPE_PLAIN;
         }
     }
+
     function getMimeType() {
         return $this->mimeType;
     }
@@ -58,6 +62,7 @@ class TemplateEmail {
     }
 
     public function getTextMessage() {
+      
         return preg_replace($this->getArrayRegularExpressionKeyParameter(), $this->listAllParameter, $this->templateMessage);
     }
 
@@ -103,8 +108,13 @@ class TemplateEmail {
         preg_match_all('/\#(\w+)\#/', $string, $MachArray);
         return array_fill_keys($MachArray[1], '');
     }
+
     public function getEmailReply() {
         return $this->emailReply;
+    }
+
+    public function isHtml() {
+        return ($this->mimeType == self::MIME_TYPE_HTML);
     }
 
 }

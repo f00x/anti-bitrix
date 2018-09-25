@@ -49,7 +49,13 @@ class SubscriptionEmail {
         $emailListString =substr($emailListString,0,-1);
         return $emailListString;
     }
-
+ public function eachRecipientEmail()
+ {
+     foreach($this->listRecipientEmail as $RecipientEmail){
+         yield $RecipientEmail->getEmail();
+         
+     }
+ }
     private function addListRecipientEmail($arrayListRecipientEmail) {
         foreach ($arrayListRecipientEmail as $arrayRecipientEmail) {
             $this->listRecipientEmail[] = new RecipientEmail($arrayRecipientEmail);
@@ -88,6 +94,10 @@ class SubscriptionEmail {
         $this->TemplateEmail = $TemplateEmail;
     }
    
+    function setEmailFrom($emailFrom) {
+        $this->emailFrom = $emailFrom;
+    }
+
 
 
 }
