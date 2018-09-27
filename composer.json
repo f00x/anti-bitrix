@@ -2,7 +2,7 @@
     "name": "f00x/anti-bitrix",
     "description": "A set of classes for easy operation. With the database and Bitrix settings.In case the bitrix code does not work for you =) See the examples in the file. See the readme.md file for examples.",
     "keywords": ["bitrix", "form", "email"],
-    "license": "GPL",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Evgeniy Lisin",
