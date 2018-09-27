@@ -34,7 +34,7 @@ class SmtpMessageManager implements MessageManagerInterface {
     use TraitBaseMessageManager;
 
     private function getMessage(TemplateEmail $TemplateEmail, SubscriptionEmail $SubscriptionEmail) {
-        $Message = new Swift_Message('11');
+        $Message = new Swift_Message();
       
         $Message->setFrom($SubscriptionEmail->getEmailFrom());
         $Message->setSubject($TemplateEmail->getTextSubject());
