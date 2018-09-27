@@ -1,5 +1,7 @@
 # anti bitrix library
-Эта библиотека изначально создана. По скольку стандартным функционал не делает то, что должен делать.
+
+Current Package. This is a set of classes that realizes an alternative to standard work.
+
 ## Installation
 
 ### Composer (recommended)
@@ -83,8 +85,11 @@ if($Proxy->isSuccess(1))
 {/* print message and other */
 }
 ```
+
 ## Send Email
+
 ### basic use case
+
 This package also allows 
 -Create letters by template.
 -To do dispatch on data and object of dispatch
@@ -101,7 +106,9 @@ Step cofig bitrix form send email
 2) create "Email event types" item (set MAIL_EVENT_TYPE value)
 3) create "E-Mail templates" item
 4) create "Newsletter categories" item
+
 ### Custom use
+
 Create custom class by  "MessageManagerInterface"
 A basic example in the source code of a class "SmtpMessageManager"
 
