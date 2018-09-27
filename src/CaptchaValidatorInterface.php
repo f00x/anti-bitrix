@@ -12,6 +12,7 @@ namespace f00x\AntiBitrix;
  *
  * @author adm.e.lisin
  */
-interface CaptchaInterface {
+interface CaptchaValidatorInterface {
+   public function __construct($secret_key, $responce, \PDO $DB);
    public function isValid();
 }

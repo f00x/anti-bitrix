@@ -7,7 +7,7 @@ namespace f00x\AntiBitrix;
  *
  * @author adm.e.lisin
  */
-class CaptchaStandart implements CaptchaInterface {
+class CaptchaValidatorStandart implements CaptchaValidatorInterface {
 
     /**
      * @var string
@@ -21,9 +21,9 @@ class CaptchaStandart implements CaptchaInterface {
      */
     private $DB;
 
-    public function __construct($idCapcha, $inputString, \PDO $DB) {
-        $this->idCapcha = $this->keyDbEscape($idCapcha);
-        $this->inputString = strtoupper($this->keyDbEscape($inputString));
+    public function __construct($secret_key, $responce, \PDO $DB) {
+        $this->idCapcha = $this->keyDbEscape($secret_key);
+        $this->inputString = strtoupper($this->keyDbEscape($$responce));
         $this->DB = $DB;
     }
 
@@ -48,6 +48,6 @@ class CaptchaStandart implements CaptchaInterface {
 
         return $stmt;
     }
-
+   
     //put your code here
 }

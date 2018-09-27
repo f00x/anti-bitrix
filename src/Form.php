@@ -98,5 +98,9 @@ class Form {
     function getListField(): array {
         return $this->listField;
     }
+    function getId() {
+        return $this->id;
+    }
+
 
 }

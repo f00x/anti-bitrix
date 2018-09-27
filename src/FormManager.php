@@ -59,10 +59,7 @@ class FormManager {
         }
     }
     
-    public function getCaptcha($POST) {
-        
-        return new CaptchaStandart($POST["captcha_sid"], $POST["captcha_word"], $this->DB);
-    }
+
 /**
  * 
  * @return \PDOStatement
