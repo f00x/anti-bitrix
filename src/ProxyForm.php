@@ -32,7 +32,7 @@ class ProxyForm {
     private $DB;
     private $isSuccess = false;
     private $idFormProcessed;
-
+    private $isValidCaptcha=false;
     /**
      *
      * @var Form[]
@@ -47,7 +47,7 @@ class ProxyForm {
         $this->ReCaptchaSiteKey = $ConfigManager->getReCaptchaSiteKey();
         $this->ReCaptchaSecredKey = $ConfigManager->getReCaptchaSecredKey();
         $this->DB = $ConfigManager->getMysqlPDOConnect();
-        
+       
     }
 
     public function getReCaptchaHtmlBlock() {
@@ -131,16 +131,30 @@ EOT;
             if ($Form->isCaptcha()) {
                 if ($this->getCaptchaValidator($_POST)->isValid()) {
                     $this->runEmitationStandartCaptchaSuccess();
+                     $this->isValidCaptcha=true;
                     $this->isSuccess = true;
                 } else {
                     $this->runEmitationStandartCaptchaFalse();
                     $this->isSuccess = false;
                 }
             } else {
+                $this->isValidCaptcha=true;
                 $this->isSuccess = true;
             }
         }
     }
+    
+    function isValidCaptcha() {
+        return $this->isValidCaptcha;
+    }
+
+        
+    
+    
+    
+    
+    
+    
 
     private function isReCaptcha() {
         return ($this->ReCaptchaSiteKey && $this->ReCaptchaSecredKey);

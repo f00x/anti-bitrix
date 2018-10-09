@@ -48,15 +48,17 @@ class SmtpMessageManager implements MessageManagerInterface {
         return $Message;
     }
 
-    public function sendMsgForm(Form $Form) {
+    public function sendMsgForm(Form $Form, $isUseActive=true) {
         $TemplateEmail = $this->getTemplateEmail($Form->getMailEventKey());
         $SubscriptionEmail = $this->getSubscriptionEmail($Form->getMailEventKey());
-        if ($SubscriptionEmail->isActive()) {
+        if (($isUseActive&&$SubscriptionEmail->isActive())||!$isUseActive) {
             $TemplateEmail->applyFormData($Form);
             $MsgObject = $this->getMessage($TemplateEmail, $SubscriptionEmail);
 
             $this->Smtp->send($MsgObject);
+            return true;
         }
+        return false;
     }
 
 }
