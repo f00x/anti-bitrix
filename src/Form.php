@@ -49,7 +49,7 @@ class Form {
     }
 
     public function handleRequestPOST($POST) {
-        if ($POST['WEB_FORM_ID'] == $this->id)
+        if (isset($POST['WEB_FORM_ID'])&&$POST['WEB_FORM_ID'] == $this->id)
             $this->isSubmitted = true;
 
         $this->testValidAllFields($POST);
@@ -95,7 +95,7 @@ class Form {
         return $this->mailEventKey;
     }
 
-    function getListField(): array {
+    function getListField(){
         return $this->listField;
     }
     function getId() {
